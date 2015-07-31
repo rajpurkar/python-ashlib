@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import time
 
 import simplejson
 import nltk.tree
@@ -30,9 +31,7 @@ def _extractSentences(raw):
     try:
         sentences = []
         for sentence in raw["sentences"]:
-            sentences.append([])
-            for wordContents in sentence["words"]:
-                sentences[-1].append(wordContents[0])
+            sentences.append(sentence["text"])
         return sentences
     
     except KeyError as e:
@@ -81,10 +80,11 @@ def _extractCoref(raw):
 def _parse(raw):
     if raw is None:
         return (None, None, None)
-    sentences = _extractSentences(raw)
-    trees = _extractSyntacticParseTrees(raw)
-    coref = _extractCoref(raw)
-    return (sentences, trees, coref)
+    else:
+        sentences = _extractSentences(raw)
+        trees = _extractSyntacticParseTrees(raw)
+        coref = _extractCoref(raw)
+        return (sentences, trees, coref)
 
 ## public functions ############################################################################################################
 
@@ -100,6 +100,12 @@ def extractCoref(text):
 def parse(text):
     return _parse(_rawParse(text))
 
+def startServer():
+    if os.fork() == 0:
+        subprocess.Popen(["python", os.path.join(".", "corenlp.py")], cwd=os.path.join(os.path.dirname(__file__), "corenlp"))
+    else:
+        time.sleep(30)
+
 ## CoreNLP #####################################################################################################################
 
 class CoreNLP(object):
@@ -107,6 +113,7 @@ class CoreNLP(object):
     def __init__(self):
         self.server = corenlp.jsonrpc.ServerProxy(corenlp.jsonrpc.JsonRpc20(),
                                                   corenlp.jsonrpc.TransportTcpIp(addr=("127.0.0.1", 8080)))
+        ##startServer() ## TODO: figure this out later
 
     # Public methods:
 
