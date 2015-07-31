@@ -45,7 +45,10 @@ def _extractSyntacticParseTrees(raw):
     try:
         trees = []
         for sentence in raw["sentences"]:
-            trees.append(nltk.tree.Tree.fromstring(sentence["parsetree"]))
+            tree = sentence["parsetree"]
+            if tree.rfind("] ") != -1:
+                tree = tree[tree.rfind("] ") + 2:]
+            trees.append(nltk.tree.Tree.fromstring(tree))
         return trees
 
     except KeyError as e:
