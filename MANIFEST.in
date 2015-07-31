@@ -1,0 +1,2 @@
+recursive-include ashlib/ling/corenlp/*
+recursive-include ashlib/ling/res/*
