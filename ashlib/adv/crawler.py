@@ -10,7 +10,7 @@ from ..util import web
 
 import threadpool
 
-def crawl(seeds, pageHandler, linkCondition=lambda link: True, stoppingCondition=lambda processedCount: False, pool=None, verbose=False):
+def crawl(seeds, pageHandler, linkCondition=lambda link: True, stoppingCondition=lambda processedCount: False, pool=None, priority=0, verbose=False):
     ## TODO: add respect for robots.txt and shit like that
     
     LINK_REGEX = "href\=\"([^\"]+)\""
@@ -39,7 +39,7 @@ def crawl(seeds, pageHandler, linkCondition=lambda link: True, stoppingCondition
                     seen.add(newLink)
                     lock.release()
 
-                    pool.put(iteration, args=[newLink])
+                    pool.put(iteration, args=[newLink], priority=priority)
 
             lock.acquire()
             processedCount[0] += 1
@@ -52,7 +52,7 @@ def crawl(seeds, pageHandler, linkCondition=lambda link: True, stoppingCondition
                 print "Crawled %s pages, %s seen and ratio = %s" % (pcount, scount, ratio)
     
     for seed in seeds:
-        pool.put(iteration, args=[seed])
+        pool.put(iteration, args=[seed], priority=priority)
         
     return pool
     

@@ -2,6 +2,9 @@ import os
 import sys
 import re
 import time
+import threading
+import subprocess
+import signal
 
 import simplejson
 import nltk.tree
@@ -9,31 +12,31 @@ import nltk.tree
 import corenlp.jsonrpc
 import corenlp.corenlp
 
+from ..util import process
+
 ## private functions ##########################################################################################################
 
-def _rawParseWithServer(text, server):
+def _rawParseWithProxy(text, proxy):
     if len(text) <= 600: ## TODO: refine this number
-        NUM_ATTEMPTS = 5
+        NUM_ATTEMPTS = 3
         for _ in range(NUM_ATTEMPTS):
-            try: return simplejson.loads(server.parse(text))
-            except (corenlp.jsonrpc.RPCInternalError, corenlp.jsonrpc.RPCTransportError) as e: pass
+            try:
+                return simplejson.loads(proxy.parse(text))
+            except (corenlp.jsonrpc.RPCInternalError, corenlp.jsonrpc.RPCTransportError, corenlp.jsonrpc.RPCParseError) as error:
+                print "CoreNLP Error:", error
     return None
 
 def _rawParse(text):
-    server = corenlp.jsonrpc.ServerProxy(corenlp.jsonrpc.JsonRpc20(),
+    proxy = corenlp.jsonrpc.ServerProxy(corenlp.jsonrpc.JsonRpc20(),
                                      corenlp.jsonrpc.TransportTcpIp(addr=("127.0.0.1", 8080)))
-    return _rawParseWithServer(text, server)
+    return _rawParseWithProxy(text, proxy)
 
 def _extractSentences(raw):
     if raw is None:
         return None
     
     try:
-        sentences = []
-        for sentence in raw["sentences"]:
-            sentences.append(sentence["text"])
-        return sentences
-    
+        return [sentence["text"] for sentence in raw["sentences"]]
     except KeyError as e:
         return None
 
@@ -100,31 +103,71 @@ def extractCoref(text):
 def parse(text):
     return _parse(_rawParse(text))
 
-def startServer():
-    if os.fork() == 0:
-        subprocess.Popen(["python", os.path.join(".", "corenlp.py")], cwd=os.path.join(os.path.dirname(__file__), "corenlp"))
-    else:
-        time.sleep(30)
-
 ## CoreNLP #####################################################################################################################
+
+## TODO: ultimately, all of the server generation stuff should be done at the global variable level and not the clas level (given current implementation only one instance can exist at a time)
 
 class CoreNLP(object):
     
-    def __init__(self):
-        self.server = corenlp.jsonrpc.ServerProxy(corenlp.jsonrpc.JsonRpc20(),
-                                                  corenlp.jsonrpc.TransportTcpIp(addr=("127.0.0.1", 8080)))
-        ##startServer() ## TODO: figure this out later
+    SERVER_HOST = "127.0.0.1"
+    SERVER_PORT = 8080
+    CONSECUTIVE_ERROR_THRESHOLD = 2
+    
+    def __init__(self, cnlpPath, cnlpVersion):
+        self.cnlpPath = cnlpPath
+        self.cnlpVersion = cnlpVersion
+        self.consecutiveErrorCount = 0
+        transport = corenlp.jsonrpc.TransportTcpIp(addr=(self.SERVER_HOST, self.SERVER_PORT))
+        self.proxy = corenlp.jsonrpc.ServerProxy(corenlp.jsonrpc.JsonRpc20(), transport)
+        self._restartServer()
+        self.lock = threading.Lock()
 
-    # Public methods:
+    def _restartServer(self):        
+        # Kill old processes serving at our port:
+        for pid in process.getServerPIDs(self.SERVER_PORT):
+            os.kill(pid, signal.SIGKILL)
+        
+        spin = [True]
+        def handler(signum, stack):
+            spin[0] = False
+        signal.signal(signal.SIGUSR1, handler)
+        
+        # Create new server at that port:
+        if os.fork() == 0:
+            server = corenlp.corenlp.startServer(self.cnlpPath, self.cnlpVersion, self.SERVER_HOST, self.SERVER_PORT)
+            os.kill(os.getppid(), signal.SIGUSR1)
+            server.serve()
+        else:
+            while spin[0]: time.sleep(2)
+            time.sleep(5) # just to be safe
+        
+        # The multithreaded version of the above code (not way to kill a thread though):
+        '''self.serverThread = threading.Thread(target=self.server.serve)
+        self.serverThread.setDaemon(True)
+        self.serverThread.start()'''
+    
+    def _processResult(self, parser, text):
+        self.lock.acquire()
+        result = parser(text)
+        if result is None:
+            self.consecutiveErrorCount += 1
+        else:
+            self.consecutiveErrorCount = 0
+        if self.consecutiveErrorCount >= self.CONSECUTIVE_ERROR_THRESHOLD:
+            self._restartServer()
+            self.consecutiveErrorCount = 0
+            result = parser(text)
+        self.lock.release()
+        return result
 
     def extractSentences(self, text):
-        return _extractSentences(self.__rawParse(text))
+        return self._processResult(lambda text: _extractSentences(self.__rawParse(text)), text)
 
     def extractSyntacticParseTrees(self, text):
-        return _extractSyntacticParseTrees(self.__rawParse(text))
+        return self._processResult(lambda text: _extractSyntacticParseTrees(self.__rawParse(text)), text)
 
     def extractCoref(self, text):
-        return _extractCoref(self.__rawParse(text))
+        return self._processResult(lambda text: _extractCoref(self.__rawParse(text)), text)
 
     def parse(self, text):
-        return _parse(_rawParseWithServer(text, self.server))
+        return self._processResult(lambda text: _parse(_rawParseWithProxy(text, self.proxy)), text)

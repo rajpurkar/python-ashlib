@@ -145,13 +145,13 @@ class WorkerThread(threading.Thread):
             # queue after self._poll_timout seconds, we jump to the start of
             # the while loop again, to give the thread a chance to exit.
             try:
-                request = self._requests_queue.get(True, self._poll_timeout)
+                priority, request = self._requests_queue.get(True, self._poll_timeout)
             except Queue.Empty:
                 continue
             else:
                 if self._dismissed.isSet() or self.stoppingCondition():
                     # we are dismissed, put back request in queue and exit loop
-                    self._requests_queue.put(request)
+                    self._requests_queue.put((priority, request))
                     break
                 try:
                     result = request.callable(*request.args, **request.kwds)
@@ -249,7 +249,7 @@ class ThreadPool:
 
         """
         self.stoppingCondition = stoppingCondition
-        self._requests_queue = Queue.Queue(q_size)
+        self._requests_queue = Queue.PriorityQueue(q_size)
         self._results_queue = Queue.Queue(resq_size)
         self.workers = []
         self.dismissedWorkers = []
@@ -295,17 +295,17 @@ class ThreadPool:
             worker.join()
         self.dismissedWorkers = []
 
-    def putRequest(self, request, block=True, timeout=None):
+    def putRequest(self, request, block=True, timeout=None, priority=0):
         """Put work request into work queue and save its id for later."""
         assert isinstance(request, WorkRequest)
         # don't reuse old work requests
         assert not getattr(request, "exception", None)
-        self._requests_queue.put(request, block, timeout)
+        self._requests_queue.put((priority, request), block, timeout)
         self.workRequests[request.requestID] = request
     
-    def put(self, task, args=None, callback=None):
+    def put(self, task, args=None, callback=None, priority=0):
         ## I added this method
-        self.putRequest(WorkRequest(task, args=args, callback=callback))
+        self.putRequest(WorkRequest(task, args=args, callback=callback), priority=priority)
 
     def poll(self, block=False):
         """Process any new results in the queue."""

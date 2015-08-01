@@ -1,6 +1,2 @@
-recursive-include ashlib/ling/corenlp/*
-recursive-include ashlib/ling/res/*
-recursive-include ashlib/ling/stanford-corenlp/*
-recursive-include ashlib/ling/stanford-corenlp/patterns/*
-recursive-include ashlib/ling/stanford-corenlp/sutime/*
-recursive-include ashlib/ling/stanford-corenlp/tokensregex/*
+recursive-include ashlib/ling/corenlp *
+recursive-include ashlib/ling/res *

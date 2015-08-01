@@ -13,6 +13,9 @@ def withinDays(date, referenceDate, days):
     delta = datetime.timedelta(days=days)
     return date >= referenceDate - delta
 
+def withinDaysOfToday(date, days):
+    return withinDays(date, today(), days)
+
 def withinWeekOf(date, referenceDate):
     return withinDays(date, referenceDate, 7)
 

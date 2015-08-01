@@ -127,43 +127,40 @@ class StanfordCoreNLP(object):
     Command-line interaction with Stanford's CoreNLP java utilities.
     Can be run as a JSON-RPC server or imported as a module.
     """
-    def __init__(self, corenlp_path=None):
+    def __init__(self, corenlp_path, corenlp_version):
         """
         Checks the location of the jar files.
         Spawns the server as a process.
         """
-        jars = ["stanford-corenlp-3.5.2.jar",
-                "stanford-corenlp-3.5.2-models.jar",
+        jars = ["stanford-corenlp-" + corenlp_version + ".jar",
+                "stanford-corenlp-" + corenlp_version + "-models.jar",
                 "joda-time.jar",
                 "xom.jar",
                 "jollyday.jar"]
-       
-        # if CoreNLP libraries are in a different directory,
-        # change the corenlp_path variable to point to them
-        if not corenlp_path:
-            corenlp_path = os.path.join(os.path.dirname(__file__), "..", "stanford-corenlp/")
         
         java_path = "java"
         classname = "edu.stanford.nlp.pipeline.StanfordCoreNLP"
         # include the properties file, so you can change defaults
         # but any changes in output format will break parse_parser_results()
-        props = "-props default.properties" 
+        props = "-props " + os.path.join(os.path.dirname(__file__), "default.properties")
         
         # add and check classpaths
-        jars = [corenlp_path + jar for jar in jars]
+        jars = [os.path.join(corenlp_path, jar) for jar in jars]
         for jar in jars:
             if not os.path.exists(jar):
                 logger.error("Error! Cannot locate %s" % jar)
                 sys.exit(1)
+    
+        jars = [jar.replace(" ", "\ ") for jar in jars]
         
         # spawn the server
         start_corenlp = "%s -Xmx1800m -cp %s %s %s" % (java_path, ':'.join(jars), classname, props)
-        if VERBOSE: 
+        if VERBOSE:
             logger.debug(start_corenlp)
         self.corenlp = pexpect.spawn(start_corenlp)
         
         # show progress bar while loading the models
-        widgets = ['Loading Models: ', Fraction()]
+        widgets = ["Loading Models: ", Fraction()]
         pbar = ProgressBar(widgets=widgets, maxval=5, force_update=True).start()
         self.corenlp.expect("done.", timeout=20) # Load pos tagger model (~5sec)
         pbar.update(1)
@@ -241,21 +238,13 @@ class StanfordCoreNLP(object):
         return json.dumps(response)
 
 
-if __name__ == '__main__':
-    """
-    The code below starts an JSONRPC server
-    """
-    parser = optparse.OptionParser(usage="%prog [OPTIONS]")
-    parser.add_option('-p', '--port', default='8080',
-                      help='Port to serve on (default: 8080)')
-    parser.add_option('-H', '--host', default='127.0.0.1',
-                      help='Host to serve on (default: 127.0.0.1. Use 0.0.0.0 to make public)')
-    options, args = parser.parse_args()
-    server = jsonrpc.Server(jsonrpc.JsonRpc20(),
-                            jsonrpc.TransportTcpIp(addr=(options.host, int(options.port))))
-    
-    nlp = StanfordCoreNLP()
+def startServer(corenlpPath, corenlpVersion, host, port):
+    server = jsonrpc.Server(jsonrpc.JsonRpc20(), jsonrpc.TransportTcpIp(addr=(host, port)))
+    nlp = StanfordCoreNLP(corenlpPath, corenlpVersion)
     server.register_function(nlp.parse)
-    
-    logger.info('Serving on http://%s:%s' % (options.host, options.port))
+    if VERBOSE: logger.debug("Serving on http://%s:%s" % (host, port))
+    return server
+
+if __name__ == "__main__":
+    server = startServer()
     server.serve()
