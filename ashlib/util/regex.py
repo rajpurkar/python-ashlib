@@ -2,8 +2,6 @@ import os
 import sys
 import re
 
-import str
-
 def matches(regex, string):
     return not re.match(regex, string) is None
 

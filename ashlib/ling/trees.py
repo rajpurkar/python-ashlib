@@ -9,8 +9,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from settings import *
 
 import ashlib.util.regex
-import ashlib.util.str
-import ashlib.util.list
+import ashlib.util.str_
+import ashlib.util.list_
 
 import tokenize
 
@@ -24,10 +24,10 @@ def getWord(tree):
     else: raise ValueError("|tree| must be a valid word tree.")
 
 def wordMatches(tree, matcher):
-    return isWord(tree) and ashlib.util.str.matches(getWord(tree), matcher)
+    return isWord(tree) and ashlib.util.str_.matches(getWord(tree), matcher)
 
 def posMatches(tree, matcher):
-    if isinstance(tree, nltk.tree.Tree): return ashlib.util.str.matches(tree.label(), matcher)
+    if isinstance(tree, nltk.tree.Tree): return ashlib.util.str_.matches(tree.label(), matcher)
     else: return False
 
 def extractWords(tree):
@@ -51,7 +51,7 @@ def containsPhrases(tree, phrases):
     return all(containsPhrase(tree, phrase) for phrase in phrases)
 
 def reduceIfPossible(tree, function):
-    matches = ashlib.util.list.concatenate(function(child) for child in tree)
+    matches = ashlib.util.list_.concatenate(function(child) for child in tree)
     return matches if matches else [tree]
 
 def findPhrase(tree, phrase):

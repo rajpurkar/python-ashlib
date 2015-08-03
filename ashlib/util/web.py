@@ -3,13 +3,24 @@ import sys
 import requests
 import urllib
 import logging
+import time
 
-import str
+import selenium.webdriver
+
+import str_
 
 logging.getLogger("requests").setLevel(logging.WARNING) ## TODO: move elsewhere?
 
-def read(url):
-    return str.sanitize(requests.get(url, headers={"User-Agent": "Mozilla/5.0"}).text)
+BROWSER = selenium.webdriver.Chrome()
+
+def read(url, headers={}):
+    headers = {"User-Agent": "Mozilla/5.0"}.update(headers)
+    return str_.sanitize(requests.get(url, headers=headers).text)
+
+def readViaBrowser(url, pause=5):
+    BROWSER.get(url)
+    time.sleep(pause)
+    return BROWSER.page_source
 
 def overwrite(filePath, url):
     file = open(filePath, "w+")
@@ -23,3 +34,5 @@ def extractDomain(link):
 
 def isRelativeUrl(link):
     return len(link) > 0 and link[0] == "/"
+
+

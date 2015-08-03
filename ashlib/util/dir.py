@@ -1,12 +1,12 @@
 import os
 import sys
 
-import file
+import file_
 
 def listStdDir(dirPath):
     std = []
     for name in os.listdir(dirPath):
-        if not file.hidden(name):
+        if not file_.hidden(name):
             std.append(os.path.join(dirPath, name))
     return std
 
