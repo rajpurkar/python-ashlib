@@ -11,16 +11,22 @@ import str_
 
 logging.getLogger("requests").setLevel(logging.WARNING) ## TODO: move elsewhere?
 
-BROWSER = selenium.webdriver.Chrome()
+try:
+    BROWSER = selenium.webdriver.Chrome()
+except Exception as error:
+    print error
 
 def read(url, headers={}):
     headers = {"User-Agent": "Mozilla/5.0"}.update(headers)
     return str_.sanitize(requests.get(url, headers=headers).text)
 
 def readViaBrowser(url, pause=5):
-    BROWSER.get(url)
-    time.sleep(pause)
-    return BROWSER.page_source
+    if BROWSER is None:
+        raise Exception("Selenium Chrome webdriver not available.")
+    else:
+        BROWSER.get(url)
+        time.sleep(pause)
+        return BROWSER.page_source
 
 def overwrite(filePath, url):
     file = open(filePath, "w+")
