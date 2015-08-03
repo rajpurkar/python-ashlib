@@ -285,7 +285,8 @@ class ThreadPool:
     
     def stop(self):
         ## I added this method
-        self.dismissWorkers(len(self.workers), do_join=True)
+        ##self.dismissWorkers(len(self.workers), do_join=True) ## TODO: use this instead?
+        self.dismissWorkers(len(self.workers))
         self._stopped.set()
 
     def joinAllDismissedWorkers(self):
