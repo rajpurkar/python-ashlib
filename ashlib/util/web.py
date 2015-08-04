@@ -14,7 +14,7 @@ logging.getLogger("requests").setLevel(logging.WARNING) ## TODO: move elsewhere?
 try:
     BROWSER = selenium.webdriver.Chrome()
 except Exception as error:
-    print error
+    BROWSER = None
 
 def read(url, headers={}):
     headers = {"User-Agent": "Mozilla/5.0"}.update(headers)
