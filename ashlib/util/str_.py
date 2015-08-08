@@ -32,6 +32,9 @@ def capitalize(string):
     if len(string) > 0: return string[0].upper() + string[1:]
     else: return string
 
+def canonicalCapitalization(string):
+    return capitalize(string.lower())
+
 def matches(string, matcher):
     ## TODO: could look at how beatiful soup determines type of arg and copy
     if isinstance(matcher, basestring):
