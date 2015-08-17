@@ -1,5 +1,5 @@
 # ashlib
-A Python library containing a multitude of varied functionality.
+A Python library containing a multitude of varied functionality. This library is still very much a rough work in progress.
 
 ### Installation
 
