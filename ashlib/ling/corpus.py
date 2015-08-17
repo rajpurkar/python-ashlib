@@ -4,63 +4,46 @@ import sys
 import nltk
 import nltk.probability
 
-## LanguageModel ########################################################################################
+from ..util import file_
 
-class LanguageModel(object):
+## language model #####################################################################################
+
+UNIGRAM_LANGUAGE_MODEL = nltk.probability.LaplaceProbDist(nltk.FreqDist(nltk.corpus.brown.words()))
+
+def unigramProbability(word):
+    return UNIGRAM_LANGUAGE_MODEL.prob(word)
+
+## stop words #########################################################################################
+
+STOP_WORDS = set(file_.readlines(os.path.join(os.path.dirname(__file__), "res", "english.stop")))
+
+def isStopWord(word):
+    return word in STOP_WORDS
     
-    def __init__(self):
-        frequencies = nltk.FreqDist(nltk.corpus.brown.words())
-        self.model = nltk.probability.LaplaceProbDist(frequencies)
-    
-    def unigramProb(self, unigram):
-        return self.model.prob(unigram)
+def removeStopWords(words):
+    index = 0
+    while index < len(words):
+        word = words[index]
+        if word in STOP_WORDS: del words[index]
+        else: index += 1
 
-## StopList #############################################################################################
+## dictionary #########################################################################################
 
-class StopList(object):
-    
-    def __init__(self):
-        self.words = set(self.__readFile(os.path.join(os.path.dirname(__file__), "res", "english.stop")))
-    
-    def contains(self, word):
-        return word in self.words
-    
-    def removeStopWords(self, document):
-        index = 0
-        while index < len(document):
-            word = document[index]
-            if self.contains(word): del document[index]
-            else: index += 1
-    
-    def __readFile(self, fileName):
-        contents = []
-        f = open(fileName)
-        for line in f:
-            contents.append(line)
-        f.close()
-        result = "\n".join(contents).split()
-        return result
+ENGLISH_DICTIONARY = set(line.strip() for line in open(os.path.join(os.path.dirname(__file__), "res", "englishwords.txt")))
 
-## EnglishDictionary #####################################################################################
+def isWord(word):
+    return word.lower() in ENGLISH_DICTIONARY
 
-class EnglishDictionary(object):
-    
-    ## TODO: could consider making this a subclass of set. The challange is overwriting all necessary methods to make the input word lower case, so that the client doesn't have to worry about that.
+## common words #######################################################################################
 
-    def __init__(self):
-        self.words = set(line.strip() for line in open(os.path.join(os.path.dirname(__file__), "res", "englishwords.txt")))
+COMMON_WORDS = set(open(os.path.join(os.path.dirname(__file__), "res", "commonwords.txt")).read().split(','))
 
-    def contains(self, word):
-        return word.lower() in self.words
+def isCommon(word):
+    return word.lower() in COMMON_WORDS
 
-## EnglishTrends #########################################################################################
+## punctuation ########################################################################################
 
-class EnglishTrends(object):
+PUNCTUATION = set([".", "?", "!", ",", "\"", ":", ";", "'", "-"])
 
-    ## TODO: like with dictionary, could consider making this a subclass of set. Again, the challange is overwriting all necessary methods to make the input word lower case, so that the client doesn't have to worry about that.
-
-    def __init__(self):
-        self.words = set(open(os.path.join(os.path.dirname(__file__), "res", "commonwords.txt")).read().split(','))
-
-    def isCommon(self, word):
-        return word.lower() in self.words
+def isPunctuation(word):
+    return word in PUNCTUATION
