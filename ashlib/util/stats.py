@@ -2,6 +2,9 @@ import os
 import sys
 import math
 
+import scipy.stats.stats
+import numpy
+
 # All functions in this module were taken from the
 # pattern.en library, with minor modifications.
 
@@ -11,6 +14,13 @@ def mean(iterable):
 
 def average(iterable):
     return mean(iterable)
+
+def ema(iterable, window):
+    weights = numpy.exp(numpy.linspace(-1., 0., window))
+    weights /= weights.sum()
+    a =  numpy.convolve(values, weights)[:len(values)]
+    a[:window] = a[window]
+    return a[-1]
 
 def median(iterable, sort=True):
     s = sorted(iterable) if sort is True else list(iterable)
@@ -28,6 +38,12 @@ def variance(iterable, sample=False):
 
 def stdev(iterable, *args, **kwargs):
     return math.sqrt(variance(iterable, *args, **kwargs))
+
+def covariance(iterable1, iterable2):
+    return numpy.cov(iterable1, iterable2)[0][1] ## TODO: I don't think this is write - I think I should stack the iterables and feed them in as one arg (maybe transpose that)
+
+def correlation(iterable1, iterable2):
+    return scipy.stats.stats.pearsonr(iterable1, iterable2)[0]
 
 def main():
     # Tests
