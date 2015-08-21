@@ -3,7 +3,7 @@ import sys
 import re
 
 def matches(regex, string):
-    return not re.match(regex, string) is None
+    return re.match(regex, string) is not None
 
 def wordRegex(word):
     ## TODO: can use "\b"? Test because might not work
@@ -12,6 +12,12 @@ def wordRegex(word):
 
 def containsWord(word, string, flags=0):
     return len(re.findall(wordRegex(word), string, flags=flags)) > 0
+
+def startsWithWord(word, string, flags=0):
+    return len(re.findall("^%s(?![\w\-])" % word, string, flags=flags)) > 0
+
+def endsWithWord(word, string, flags=0):
+    return len(re.findall("(?<![\w\.\-])%s$" % word, string, flags=flags)) > 0
 
 def findMentions(words, string, flags=0):
     mentions = []

@@ -147,9 +147,18 @@ class CoreNLP(object):
         self.serverThread.start()'''
     
     def _processResult(self, parser, text):
+        def errorOcurred(result):
+            if result is None:
+                return True
+            elif isinstance(result, tuple):
+                for item in result:
+                    if item is None:
+                        return True
+            return False
+        
         self.lock.acquire()
         result = parser(text)
-        if result is None:
+        if errorOcurred(result):
             self.consecutiveErrorCount += 1
         else:
             self.consecutiveErrorCount = 0

@@ -5,6 +5,7 @@ import collections
 import nltk.tag
 
 import corpus
+import tokenize
 
 ## NERTagger ################################################################################################
 
@@ -17,13 +18,14 @@ class NERTagger(object):
                                                           os.path.join(taggerPath,
                                                                        "stanford-ner-" + taggerVersion + ".jar"))
 
-    def tags(self, words):
+    def tags(self, text):
+        words = tokenize.words(text)
         pairs = self.tagger.tag(["_" if corpus.isPunctuation(word) else word for word in words])
-        if len(words) == 1: pairs = [pairs]
         return [pair[1] for pair in pairs]
 
-    def entities(self, words):
-        tags = self.tags(words)
+    def entities(self, text):
+        words = tokenize.words(text)
+        tags = self.tags(text)
         entities = []
         
         def addEntity(entity, tag):
