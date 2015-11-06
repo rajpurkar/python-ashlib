@@ -25,11 +25,12 @@ def send(content, recipient, subject, sender, verbose=False):
                            "subject: %s" % subject,
                            "to: %s" % recipient,
                            "mime-version: 1.0",
-                           "content-type: text/html"])
+                           "content-type: text/html",
+                           "reply-to: %s@gmail.com" % sender.username])
     content = headers + "\r\n\r\n" + content
     
     if verbose: print "Sending mail ..."
-    server.sendmail(sender.username, recipient, content)
+    server.sendmail(sender.username + "@gmail.com", recipient, content)
     server.quit()
 
     if verbose: print "Done!"

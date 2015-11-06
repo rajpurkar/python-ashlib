@@ -12,6 +12,7 @@ import tokenize
 class NERTagger(object):
 
     def __init__(self, taggerPath, taggerVersion):
+        ## TODO: should check to ensure path and version yeild correct files, and raise a descriptive exception if they don't.
         self.tagger = nltk.tag.stanford.StanfordNERTagger(os.path.join(taggerPath,
                                                                        "classifiers",
                                                                        "english.all.3class.distsim.crf.ser.gz"),

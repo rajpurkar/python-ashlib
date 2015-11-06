@@ -27,6 +27,9 @@ def posMatches(tree, matcher):
     if isinstance(tree, nltk.tree.Tree): return str_.matches(tree.label(), matcher)
     else: return False
 
+def isPotentialNounPhrase(tree):
+    return posMatches(tree, lambda tag: tag.startswith("N") or tag == "S")
+
 def extractWords(tree):
     return tree.leaves()
 
@@ -42,7 +45,7 @@ def matchesWord(tree, word):
 
 def containsPhrase(tree, phrase):
     if isinstance(tree, basestring): return False
-    return regex.containsPhrase(phrase, tree.leaves(), flags=re.IGNORECASE)
+    else: return regex.containsPhrase(phrase, tree.leaves(), flags=re.IGNORECASE)
 
 def containsPhrases(tree, phrases):
     return all(containsPhrase(tree, phrase) for phrase in phrases)

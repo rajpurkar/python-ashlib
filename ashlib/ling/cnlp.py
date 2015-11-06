@@ -14,6 +14,8 @@ import corenlp.corenlp
 
 from ..util import process
 
+## TODO: update all the function code, much of which is really out of date (only the class interface works right now)
+
 ## private functions ##########################################################################################################
 
 def _rawParseWithProxy(text, proxy):
@@ -105,7 +107,7 @@ def parse(text):
 
 ## CoreNLP #####################################################################################################################
 
-## TODO: ultimately, all of the server generation stuff should be done at the global variable level and not the clas level (given current implementation only one instance can exist at a time)
+## TODO: ultimately, all of the server generation stuff should be done at the global variable level and not the class level (given current implementation only one instance can exist at a time). THIS IS ESPECIALLY IMPORTANT because creating multiple instances of the object will fuck with one another (although it's possible that just making the semaphores and locks global will solve concurrency issues and just result in reloading delays with each new instantion)
 
 class CoreNLP(object):
     
@@ -114,6 +116,7 @@ class CoreNLP(object):
     CONSECUTIVE_ERROR_THRESHOLD = 2
     
     def __init__(self, cnlpPath, cnlpVersion):
+        ## TODO: should check to ensure path and version yeild correct files, and raise a descriptive exception if they don't.
         self.cnlpPath = cnlpPath
         self.cnlpVersion = cnlpVersion
         self.consecutiveErrorCount = 0
