@@ -52,7 +52,7 @@ __license__ = "MIT license"
 # standard library modules
 import sys
 import threading
-import Queue
+import queue
 import traceback
 
 
@@ -146,7 +146,7 @@ class WorkerThread(threading.Thread):
             # the while loop again, to give the thread a chance to exit.
             try:
                 priority, request = self._requests_queue.get(True, self._poll_timeout)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
             else:
                 if self._dismissed.isSet() or self.stoppingCondition():
@@ -249,8 +249,8 @@ class ThreadPool:
 
         """
         self.stoppingCondition = stoppingCondition
-        self._requests_queue = Queue.PriorityQueue(q_size)
-        self._results_queue = Queue.Queue(resq_size)
+        self._requests_queue = queue.PriorityQueue(q_size)
+        self._results_queue = queue.Queue(resq_size)
         self.workers = []
         self.dismissedWorkers = []
         self.workRequests = {}
@@ -331,7 +331,7 @@ class ThreadPool:
                        (request.exception and request.exc_callback):
                     request.callback(request, result)
                 del self.workRequests[request.requestID]
-            except Queue.Empty:
+            except queue.Empty:
                 break
 
     def wait(self):

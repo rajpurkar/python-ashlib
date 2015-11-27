@@ -4,13 +4,13 @@ import operator
 
 def maxValue(dictionary):
     if len(dictionary) > 0:
-        return max(dictionary.iteritems(), key=operator.itemgetter(1))[1]
+        return max(iter(list(dictionary.items())), key=operator.itemgetter(1))[1]
     else:
         return None
 
 def maxKey(dictionary):
     if len(dictionary) > 0:
-        return max(dictionary.iteritems(), key=operator.itemgetter(1))[0]
+        return max(iter(list(dictionary.items())), key=operator.itemgetter(1))[0]
     else:
         return None
 

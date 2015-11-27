@@ -9,12 +9,12 @@ from ..util import regex
 from ..util import str_
 from ..util import list_
 
-import tokenize
+from . import tokenize
 
 ## basic ###########################################################################################################
 
 def isWord(tree):
-    return isinstance(tree, nltk.tree.Tree) and len(tree) == 1 and isinstance(tree[0], basestring)
+    return isinstance(tree, nltk.tree.Tree) and len(tree) == 1 and isinstance(tree[0], str)
 
 def getWord(tree):
     if isWord(tree): return tree[0]
@@ -41,10 +41,10 @@ def toString(tree):
     return tokenize.reverse(extractWords(tree))
 
 def matchesWord(tree, word):
-    return isinstance(tree[0], basestring) and tree[0].lower() == word
+    return isinstance(tree[0], str) and tree[0].lower() == word
 
 def containsPhrase(tree, phrase):
-    if isinstance(tree, basestring): return False
+    if isinstance(tree, str): return False
     else: return regex.containsPhrase(phrase, tree.leaves(), flags=re.IGNORECASE)
 
 def containsPhrases(tree, phrases):
@@ -57,7 +57,7 @@ def reduceIfPossible(tree, function):
 def findPhrase(tree, phrase):
     # |phrase| should be a list/tuple of words (strings)
     # |tree| should be an NLTK tree
-    if isinstance(tree, basestring): return []
+    if isinstance(tree, str): return []
     if not containsPhrase(tree, phrase): return []
     else: return reduceIfPossible(tree, lambda child: findPhrase(child, phrase))
 
@@ -69,7 +69,7 @@ def anonymize(tree):
     
     def recurisiveAnonymize(tree):
         for i, child in enumerate(tree):
-            if isinstance(child, basestring): tree[i] = ""
+            if isinstance(child, str): tree[i] = ""
             else: recurisiveAnonymize(child)
 
     recurisiveAnonymize(tree)
@@ -78,7 +78,7 @@ def anonymize(tree):
 ## Minimum Complete Trees ##########################################################################################
 
 def findMCTs(tree, phrase1, phrase2):
-    if isinstance(tree, basestring): return []
+    if isinstance(tree, str): return []
     if not nlp.tree.containsPhrases(tree, [phrase1, phrase2]): return []
     else: return nlp.tree.reduceIfPossible(tree, lambda child: findMCTs(child, phrase1, phrase2))
 

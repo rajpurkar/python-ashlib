@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from ..util import web
 
-import threadpool
+from . import threadpool
 
 def crawl(seeds, pageHandler, linkCondition=lambda link: True, stoppingCondition=lambda processedCount: False, pool=None, priority=0, verbose=False):
     ## TODO: add respect for robots.txt and shit like that
@@ -49,7 +49,7 @@ def crawl(seeds, pageHandler, linkCondition=lambda link: True, stoppingCondition
             
             if verbose:
                 ratio = float(pcount) / float(scount) if scount > 0 else 0.0
-                print "Crawled %s pages, %s seen and ratio = %s" % (pcount, scount, ratio)
+                print(("Crawled %s pages, %s seen and ratio = %s" % (pcount, scount, ratio)))
     
     for seed in seeds:
         pool.put(iteration, args=[seed], priority=priority)

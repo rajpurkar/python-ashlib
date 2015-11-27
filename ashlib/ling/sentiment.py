@@ -14,7 +14,7 @@ SENTIMENT_MAP = {"Very negative": 1, "Negative": 2, "Neutral": 3, "Positive": 4,
 def calc(arg):
     if isinstance(arg, list): statements = arg
     elif isinstance(arg, set): statements = list(arg)
-    elif isinstance(arg, basestring): statements = [arg]
+    elif isinstance(arg, str): statements = [arg]
     else: raise ValueError("Input must be single string, list of strings or set of strings.")
     
     # Format input:
@@ -51,5 +51,5 @@ def calc(arg):
     if len(currScores) > 0: 
         scores.append(ashlib.util.stats.mean(currScores))
     
-    if isinstance(arg, basestring): return scores[0]
+    if isinstance(arg, str): return scores[0]
     else: return scores

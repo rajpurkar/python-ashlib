@@ -16,7 +16,7 @@ def read(url, pause=0):
     try:
         browser = selenium.webdriver.Chrome()
     except Exception as error:
-        print error
+        print(error)
         browser = None
     
     if browser is None:

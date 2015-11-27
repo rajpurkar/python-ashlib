@@ -21,8 +21,9 @@
 import json
 import optparse
 import os, re, sys, time, traceback
-import jsonrpc, pexpect
-from progressbar import ProgressBar, Fraction
+from . import jsonrpc
+import pexpect
+from .progressbar import ProgressBar, Fraction
 import logging
 
 
@@ -104,7 +105,7 @@ def parse_parser_results(text):
             else:
                 split_entry = re.split("\(|, ", line[:-1])
                 if len(split_entry) == 3:
-                    rel, left, right = map(lambda x: remove_id(x), split_entry)
+                    rel, left, right = [remove_id(x) for x in split_entry]
                     sentence['dependencies'].append(tuple([rel,left,right]))
         
         elif state == STATE_COREFERENCE:
@@ -220,7 +221,7 @@ class StanfordCoreNLP(object):
             logger.debug("%s\n%s" % ('='*40, incoming))
         try:
             results = parse_parser_results(incoming)
-        except Exception, e:
+        except Exception as e:
             if VERBOSE: 
                 logger.debug(traceback.format_exc())
             raise e

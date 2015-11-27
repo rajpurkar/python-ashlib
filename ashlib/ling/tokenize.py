@@ -34,7 +34,7 @@ def reverse(words):
     return text
 
 def sentences(text):
-    initial = nltk.tokenize.sent_tokenize(text.replace(".\"", "\n").replace(u".\u201D", "\n"))
+    initial = nltk.tokenize.sent_tokenize(text.replace(".\"", "\n").replace(".\\u201D", "\n"))
     sentences = []
     for sentence in initial:
         sentences.append(sentence.replace("\n", " "))

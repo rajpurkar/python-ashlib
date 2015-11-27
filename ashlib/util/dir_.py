@@ -1,7 +1,7 @@
 import os
 import sys
 
-import file_
+from . import file_
 
 def listStdDir(dirPath):
     std = []
