@@ -1,12 +1,12 @@
 import os
 import sys
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import logging
 import time
 import threading
 
-import str_
+from . import str_
 
 logging.getLogger("requests").setLevel(logging.WARNING) ## TODO: move elsewhere?
 

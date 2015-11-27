@@ -1,6 +1,6 @@
 import os
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 def concatenate(lists):
     concatenation = []
@@ -35,10 +35,10 @@ def replace(aList, modifier):
     return aList
 
 def iprint(aList):
-    print "["
+    print("[")
     for item in aList:
-        print " ", item
-    print "]"
+        print((" ", item))
+    print("]")
 
 def permutations(lists):
     if len(lists) > 0:

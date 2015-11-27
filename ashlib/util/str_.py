@@ -1,10 +1,11 @@
 import os
 import sys
 import unicodedata
+import collections
 
 def sanitize(string):
     if type(string) is str: return string.decode("ascii")
-    elif type(string) is unicode: return unicodedata.normalize("NFKD", string).encode("ascii", "ignore")
+    elif type(string) is str: return unicodedata.normalize("NFKD", string).encode("ascii", "ignore")
     else: return ""
 
 def aggressivelySanitize(string):
@@ -37,9 +38,9 @@ def canonicalCapitalization(string):
 
 def matches(string, matcher):
     ## TODO: could look at how beatiful soup determines type of arg and copy
-    if isinstance(matcher, basestring):
+    if isinstance(matcher, str):
         return string == matcher
-    elif callable(matcher):
+    elif isinstance(matcher, collections.Callable):
         return matcher(string)
     else:
         # We check to see if |matcher| is a compiled regular expression:

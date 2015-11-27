@@ -2,7 +2,7 @@ import os
 import sys
 import re
 
-import gender
+from . import gender
 
 ## Title #####################################################################################
 

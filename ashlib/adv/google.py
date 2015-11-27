@@ -2,12 +2,12 @@ import os
 import sys
 import re
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from ..util import web
 
 def search(query, validLinkRegex):
-    urlQuery = urllib.urlencode({"q": query})
+    urlQuery = urllib.parse.urlencode({"q": query})
     link = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s" % urlQuery
     response = web.read(link)
     results = json.loads(response)

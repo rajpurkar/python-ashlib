@@ -2,7 +2,7 @@ import os
 import sys
 import re
 
-import cnlp
+from . import cnlp
 import token
 
 ## functions ################################################################################################
@@ -70,7 +70,7 @@ class CoreferenceResolver(object):
 def main():
     resolver = CoreferenceResolver()
     result = resolver.resolve("Hello world.  It is so beautiful")
-    print result
+    print(result)
 
 if __name__ == "__main__":
     main()

@@ -12,7 +12,7 @@ def generateSynonyms(word, loose=True):
     addedOriginal = False
     
     phraseFromLemma = lambda lemma: lemma.name().lower().replace("_", " ")
-    formatPhrase = lambda obj: obj.lower() if isinstance(obj, basestring) else phraseFromLemma(obj)
+    formatPhrase = lambda obj: obj.lower() if isinstance(obj, str) else phraseFromLemma(obj)
     
     def update(obj, pos):
         phrase = formatPhrase(obj)
@@ -34,7 +34,7 @@ def generateSynonyms(word, loose=True):
     isValid = lambda counter, phrase: counter[phrase] >= 1
                     
     for pos in synonyms:
-        synonyms[pos] = [phrase for phrase in synonyms[pos].keys() if isValid(synonyms[pos], phrase)]
+        synonyms[pos] = [phrase for phrase in list(synonyms[pos].keys()) if isValid(synonyms[pos], phrase)]
 
     return synonyms
 

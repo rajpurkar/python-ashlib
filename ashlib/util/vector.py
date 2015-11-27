@@ -91,14 +91,14 @@ def toInt(vector):
     return vector
 
 def normalize(vector):
-    total = sum(vector.itervalues())
+    total = sum(vector.values())
     for key in vector:
         vector[key] = float(vector[key]) / float(total)
     return vector
 
 def increment(d1, scale, d2):
     # Taken from the CS 221 pset 2 (sentiment) util file.
-    for f, v in d2.items():
+    for f, v in list(d2.items()):
         d1[f] = d1.get(f, 0) + v * scale
 
 def scale(d1, factor):

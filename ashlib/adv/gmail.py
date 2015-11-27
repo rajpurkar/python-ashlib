@@ -14,13 +14,13 @@ def send(content, recipient, subject, sender, verbose=False):
     # |sender| should be a GmailAccount object instance
     # |verbose| should be a boolean value
     
-    if verbose: print "Firing up email server ..."
+    if verbose: print("Firing up email server ...")
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.ehlo()
     server.starttls()
     server.login(sender.username, sender.password)
     
-    if verbose: print "Composing email ..."
+    if verbose: print("Composing email ...")
     headers = "\r\n".join(["from: %s" % sender.name,
                            "subject: %s" % subject,
                            "to: %s" % recipient,
@@ -29,11 +29,11 @@ def send(content, recipient, subject, sender, verbose=False):
                            "reply-to: %s@gmail.com" % sender.username])
     content = headers + "\r\n\r\n" + content
     
-    if verbose: print "Sending mail ..."
+    if verbose: print("Sending mail ...")
     server.sendmail(sender.username + "@gmail.com", recipient, content)
     server.quit()
 
-    if verbose: print "Done!"
+    if verbose: print("Done!")
 
 ## GmailAccount ##############################################################
 

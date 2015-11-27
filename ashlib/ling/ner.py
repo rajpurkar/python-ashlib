@@ -4,8 +4,8 @@ import collections
 
 import nltk.tag
 
-import corpus
-import tokenize
+from . import corpus
+from . import tokenize
 
 ## NERTagger ################################################################################################
 

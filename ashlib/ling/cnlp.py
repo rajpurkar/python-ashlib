@@ -9,8 +9,8 @@ import signal
 import simplejson
 import nltk.tree
 
-import corenlp.jsonrpc
-import corenlp.corenlp
+from . import corenlp.jsonrpc
+from . import corenlp.corenlp
 
 from ..util import process
 
@@ -25,7 +25,7 @@ def _rawParseWithProxy(text, proxy):
             try:
                 return simplejson.loads(proxy.parse(text))
             except (corenlp.jsonrpc.RPCInternalError, corenlp.jsonrpc.RPCTransportError, corenlp.jsonrpc.RPCParseError) as error:
-                print "CoreNLP Error:", error
+                print(("CoreNLP Error:", error))
     return None
 
 def _rawParse(text):
