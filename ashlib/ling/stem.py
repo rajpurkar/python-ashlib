@@ -6,11 +6,11 @@ import threading
 import subprocess
 import signal
 
-import nltk.stem.WordNetLemmatizer
+import nltk.stem.wordnet
 
 import pos
 
-LEMMATIZER = nltk.stem.WordNetLemmatizer()
+LEMMATIZER = nltk.stem.wordnet.WordNetLemmatizer()
 
 def lemmatize(words):
     tags = pos.tag(words)
