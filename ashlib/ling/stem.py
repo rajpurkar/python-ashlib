@@ -14,6 +14,6 @@ LEMMATIZER = nltk.stem.wordnet.WordNetLemmatizer()
 
 def lemmatize(words):
     tags = pos.tag(words)
-    for word, index in enumerate(words):
-        words[index] = LEMMATIZER.lemmatize(word, tag)
+    for index, word in enumerate(words):
+        words[index] = self.lemmatizer.lemmatize(word, tags[index])
     return words
