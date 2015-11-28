@@ -37,6 +37,7 @@ def removeStopWords(words):
         word = words[index]
         if word in __stopWords(): del words[index]
         else: index += 1
+    return words
 
 ## dictionary #########################################################################################
 
