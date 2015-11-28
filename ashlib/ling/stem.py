@@ -8,7 +8,7 @@ import signal
 
 import nltk.stem.wordnet
 
-import pos
+from . import pos
 
 LEMMATIZER = nltk.stem.wordnet.WordNetLemmatizer()
 
