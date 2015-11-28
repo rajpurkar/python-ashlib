@@ -2,7 +2,7 @@ import os
 import sys
 import math
 
-import learner
+from . import learner
 
 import sklearn.svm
 import sklearn.linear_model

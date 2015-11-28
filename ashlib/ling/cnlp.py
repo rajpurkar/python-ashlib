@@ -9,8 +9,8 @@ import signal
 import simplejson
 import nltk.tree
 
-from . import corenlp.jsonrpc
-from . import corenlp.corenlp
+from ..corenlp import jsonrpc
+from ..corenlp import corenlp
 
 from ..util import process
 
